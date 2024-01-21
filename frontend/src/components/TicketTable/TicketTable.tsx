@@ -138,7 +138,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
 
   const handleAssignAgent = async (data: TicketData) => {
     try {
-      if (data.agentName.length !== 0) {
+      if (data?.agentName?.length !== 0) {
         toast.warn("Agent already assigned");
         return;
       }
