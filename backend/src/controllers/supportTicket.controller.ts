@@ -5,6 +5,7 @@ import { SupportAgent } from "../models/supportAgent.model";
 import {
   validateGetAllSupportTickets,
   validateSupportTicket,
+  validateUpdateSupportTicket,
 } from "../validators/supportTicket.validator";
 import { SupportTicket } from "../models/supportTicket.model";
 import { MetaData } from "../models/metaData.model";
@@ -24,7 +25,57 @@ const createSupportTicket = async (req: Request, res: Response) => {
       );
     }
 
-    const { topic, description, severity, type } = value;
+    const { topic, description, severity, type, resolvedOn } = value;
+
+    const existingTicket = await SupportTicket.findOne({
+      topic,
+    });
+
+    if (existingTicket) {
+      throw new ApiError(409, "", ["Ticket already exists"]);
+    }
+
+    const newTicket = await SupportTicket.create({
+      topic,
+      description,
+      severity,
+      type,
+      status: "New",
+      resolvedOn,
+    });
+
+    return res
+      .status(201)
+      .json(new ApiResponse(201, newTicket, "Ticket created successfully"));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
+};
+
+const updateSupportTicket = async (req: Request, res: Response) => {
+  try {
+    const { error, value } = validateUpdateSupportTicket(req.body);
+
+    if (error) {
+      return res.status(400).json(
+        new ApiError(
+          400,
+          "Validation error",
+          error.details.map((data) => data.message)
+        )
+      );
+    }
+
+    const { id, topic, description, severity, type, resolvedOn } = value;
+
+    const existingTicket = await SupportTicket.findOne({
+      _id: id,
+    });
+
+    if (!existingTicket) {
+      throw new ApiError(404, "", ["Ticket not found"]);
+    }
 
     const supportAgents = await SupportAgent.find({ active: true });
     if (supportAgents.length === 0) {
@@ -45,18 +96,24 @@ const createSupportTicket = async (req: Request, res: Response) => {
 
     const assignedAgent = supportAgents[lastAssignedIndex];
 
-    const newTicket = await SupportTicket.create({
-      topic,
-      description,
-      severity,
-      type,
-      assignedTo: assignedAgent._id,
-      status: "New",
-    });
+    const updatedTicket = await SupportTicket.findOneAndUpdate(
+      { _id: id },
+      {
+        topic,
+        description,
+        severity,
+        type,
+        resolvedOn,
+        status: "Assigned",
+        assignedTo: assignedAgent._id,
+        agentName: assignedAgent.name,
+      },
+      { new: true }
+    );
 
     return res
-      .status(201)
-      .json(new ApiResponse(201, newTicket, "Ticket created successfully"));
+      .status(200)
+      .json(new ApiResponse(200, updatedTicket, "Ticket updated successfully"));
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error });
@@ -94,7 +151,7 @@ const getAllSupportTickets = async (req: Request, res: Response) => {
 
     const {
       status,
-      assignedTo,
+      agentName,
       severity,
       type,
       sortBy,
@@ -105,7 +162,7 @@ const getAllSupportTickets = async (req: Request, res: Response) => {
 
     const filter: { [key: string]: string } = {};
     if (status) filter.status = status;
-    if (assignedTo) filter.assignedTo = assignedTo;
+    if (agentName) filter.agentName = agentName;
     if (severity) filter.severity = severity;
     if (type) filter.type = type;
 
@@ -113,23 +170,33 @@ const getAllSupportTickets = async (req: Request, res: Response) => {
     if (sortBy && sortOrder) sort[sortBy] = sortOrder === "desc" ? -1 : 1;
 
     const options: { page: number; limit: number } = {
-      page: parseInt(page) || 1,
+      page: parseInt(page) || 0,
       limit: parseInt(limit) || 10,
     };
 
-    const skip: number = (options.page - 1) * options.limit;
+    const skip: number = options.page * options.limit;
 
     const tickets = await SupportTicket.find(filter)
+      .select(
+        "topic description dateCreated severity type agentName status resolvedOn"
+      )
       .sort(sort)
       .skip(skip)
       .limit(options.limit);
+
+    const totalCount = await SupportTicket.countDocuments(filter);
+
+    const responseData = {
+      tickets,
+      totalCount,
+    };
 
     return res
       .status(200)
       .json(
         new ApiResponse(
           200,
-          tickets,
+          responseData,
           tickets.length === 0
             ? "No tickets found"
             : "Tickets fetched successfully"
@@ -141,4 +208,4 @@ const getAllSupportTickets = async (req: Request, res: Response) => {
   }
 };
 
-export { createSupportTicket, getAllSupportTickets };
+export { createSupportTicket, getAllSupportTickets, updateSupportTicket };

@@ -41,6 +41,8 @@ const supportTicketSchema = new Schema(
     },
 
     resolvedOn: { type: Date },
+
+    agentName: { type: String },
   },
   { timestamps: true }
 );

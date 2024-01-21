@@ -12,9 +12,15 @@ const supportAgentSchema = Joi.object({
     })
     .required(),
   description: Joi.string().required(),
-  active: Joi.boolean().required(),
+});
+
+const getAllSupportAgentsSchema = Joi.object({
+  page: Joi.number().integer().min(0),
+  limit: Joi.number().integer().min(0),
 });
 
 const validateSupportAgent = validator(supportAgentSchema);
 
-export { validateSupportAgent };
+const validateGetAllSupportAgents = validator(getAllSupportAgentsSchema);
+
+export { validateSupportAgent, validateGetAllSupportAgents };
