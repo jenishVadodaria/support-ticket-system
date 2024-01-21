@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import TicketModal from "../../components/TicketModal/TicketModal";
 import TicketTable from "../../components/TicketTable/TicketTable";
 

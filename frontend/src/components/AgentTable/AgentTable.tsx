@@ -19,7 +19,7 @@ const AgentTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
 
   const buildUrl = () => {
     let url = `${constants.baseApiUrl}/support-agents?`;
