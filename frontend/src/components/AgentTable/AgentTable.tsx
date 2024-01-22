@@ -68,7 +68,7 @@ const AgentTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
           className="h-full w-full border border-black/10 shadow-none"
           placeholder={""}
         >
-          <CardBody placeholder={""}>
+          <CardBody placeholder={""} className="overflow-x-auto">
             <table className="w-full min-w-max table-auto text-left">
               <thead>
                 <tr>

@@ -228,8 +228,8 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
                   />
                 </div>
               </div>
-              <div>
-                <table className="w-full table-auto text-left">
+              <div className="overflow-x-auto">
+                <table className="w-full table-auto text-left ">
                   <thead>
                     <tr>
                       {constants.ticketTableHeaderData.map((head, index) => (
@@ -259,7 +259,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
                   </thead>
                   <tbody>
                     {ticketData.map((data, index) => (
-                      <tr key={index} className="even:bg-blue-gray-50/50">
+                      <tr key={index} className="even:bg-blue-gray-50/50 ">
                         <td className="p-4">
                           <Typography
                             variant="small"
@@ -344,7 +344,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
                         </td>
                         <td className="p-4">
                           <button
-                            className="relative rounded-lg px-1.5 py-1.5 text-white  bg-[#FF5A00] w-[80%]"
+                            className="relative rounded-lg px-2 py-2 text-white  bg-[#FF5A00] w-[90%]"
                             onClick={() => handleAssignAgent(data)}
                           >
                             <Typography
