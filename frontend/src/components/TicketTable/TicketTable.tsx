@@ -37,6 +37,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
   const [filterType, setFilterType] = useState("");
   const [selectedField, setSelectedField] = useState("");
   const [filterValue, setFilterValue] = useState("");
+  const [isFiltering, setIsFiltering] = useState(false);
 
   const buildUrl = () => {
     let url = `${constants.baseApiUrl}/support-tickets?`;
@@ -58,6 +59,10 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
       setTicketData(response.data.data.tickets);
       setTotalPages(Math.ceil(response.data.data.totalCount / 10));
       setLoading(false);
+      setIsFiltering(
+        !!(filterStatus || filterAssignedTo || filterSeverity || filterType) &&
+          response.data.data.tickets.length === 0
+      );
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Error fetching data. Please try again later.");
@@ -124,6 +129,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
         default:
           break;
       }
+      setIsFiltering(true);
     }, 500),
     [selectedField]
   );
@@ -167,7 +173,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
     <>
       {loading ? (
         <Loader />
-      ) : ticketData.length > 0 || filterValue.length > 0 ? (
+      ) : ticketData.length > 0 || isFiltering ? (
         <Card
           className="h-full w-full border border-black/10 shadow-none"
           placeholder={""}
@@ -388,7 +394,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
               className="font-normal text-center"
               placeholder={""}
             >
-              {`Page : ${page}`}
+              {`Page : ${page + 1} of ${totalPages}`}
             </Typography>
 
             <Button

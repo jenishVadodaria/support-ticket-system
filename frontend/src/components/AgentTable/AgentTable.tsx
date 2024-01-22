@@ -177,7 +177,7 @@ const AgentTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
               className="font-normal text-center"
               placeholder={""}
             >
-              {`Page : ${page}`}
+              {`Page : ${page + 1} of ${totalPages}`}
             </Typography>
 
             <Button
