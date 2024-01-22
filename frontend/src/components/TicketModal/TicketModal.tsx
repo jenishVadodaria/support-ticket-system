@@ -37,6 +37,7 @@ const TicketModal = ({
     type: "",
     resolvedOn: new Date(),
   });
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectDate, setSelectDate] = useState<Date>(new Date());
   const [errors, setErrors] = useState<IErrors>({
     topic: "",
@@ -91,6 +92,7 @@ const TicketModal = ({
     e.preventDefault();
     if (validateForm()) {
       try {
+        setLoading(true);
         const response: any = await axios.post(
           `${constants.baseApiUrl}/support-tickets`,
           {
@@ -110,13 +112,15 @@ const TicketModal = ({
       } catch (error) {
         console.log(error);
         toast.error("Error creating ticket. Please try again later");
+      } finally {
+        setLoading(false);
       }
     }
   };
 
   const CustomDateInput = ({ value, onClick }: any) => (
     <div
-      className="p-1 rounded-lg text-white bg-[#FF5A00] cursor-pointer"
+      className="p-1 rounded-lg text-black border border-[#FF5A00] cursor-pointer"
       onClick={onClick}
     >
       {value}
@@ -133,6 +137,7 @@ const TicketModal = ({
           mount: { scale: 1, y: 0 },
           unmount: { scale: 0.9, y: -100 },
         }}
+        size="sm"
       >
         <DialogHeader placeholder={""}>
           <div className="flex flex-row justify-between align-middle w-full">
@@ -146,7 +151,7 @@ const TicketModal = ({
           <Card className="mx-auto w-full shadow-none" placeholder={""}>
             <CardBody placeholder={""}>
               <form onSubmit={handleSubmit}>
-                <div className="w-full flex flex-row justify-between align-middle mb-4">
+                <div className="w-full flex flex-col gap-4 justify-between align-middle mb-4 max-w-[400px]">
                   <div>
                     <Typography className="pb-1" variant="h6" placeholder={""}>
                       Topic :
@@ -159,6 +164,7 @@ const TicketModal = ({
                       name="topic"
                       value={formState.topic}
                       onChange={handleChange}
+                      className="max-w-[400px]"
                     />
                     {errors.topic && (
                       <p className="text-red-500">{errors.topic}</p>
@@ -176,6 +182,7 @@ const TicketModal = ({
                       name="description"
                       value={formState.description}
                       onChange={handleChange}
+                      className="max-w-[400px]"
                     />
                     {errors.description && (
                       <p className="text-red-500">{errors.description}</p>
@@ -183,7 +190,7 @@ const TicketModal = ({
                   </div>
                 </div>
 
-                <div className="w-full flex flex-row justify-between align-middle mb-6">
+                <div className="w-full flex flex-col gap-4 justify-between align-middle mb-6 max-w-[400px]">
                   <div>
                     <Typography className="pb-1" variant="h6" placeholder={""}>
                       Severity :
@@ -196,6 +203,7 @@ const TicketModal = ({
                       name="severity"
                       value={formState.severity}
                       onChange={handleChange}
+                      className="max-w-[400px]"
                     />
                     {errors.severity && (
                       <p className="text-red-500">{errors.severity}</p>
@@ -213,16 +221,17 @@ const TicketModal = ({
                       name="type"
                       value={formState.type}
                       onChange={handleChange}
+                      className="max-w-[400px]"
                     />
                     {errors.type && (
                       <p className="text-red-500">{errors.type}</p>
                     )}
                   </div>
                 </div>
-                <div className="w-full flex flex-row justify-between align-middle">
+                <div className="w-full flex flex-col justify-between align-middle max-w-[400px]">
                   <div className="w-full flex flex-row gap-3 items-center ">
                     <Typography className="pb-1" variant="h6" placeholder={""}>
-                      Select Resolved On :
+                      Select Resolved On:
                     </Typography>
                     <DatePicker
                       selected={selectDate}
@@ -235,23 +244,24 @@ const TicketModal = ({
               </form>
             </CardBody>
             <CardFooter className="pt-0" placeholder={""}>
-              <div className="w-full flex flex-row justify-end align-middle gap-4">
+              <div className="w-full flex flex-row justify-center align-middle gap-4">
+                <Button
+                  className="rounded-lg text-black shadow-lg transition duration-200 hover:shadow-primary-hover hover:underline border border-[#FF5A00] bg-white"
+                  onClick={handleModal}
+                  size={"sm"}
+                  placeholder={""}
+                >
+                  Close
+                </Button>
                 <Button
                   className="rounded-lg text-white shadow-lg transition duration-200 hover:shadow-primary-hover hover:underline bg-[#FF5A00]"
                   type="submit"
                   size={"sm"}
                   placeholder={""}
                   onClick={handleSubmit}
+                  disabled={loading}
                 >
                   Submit
-                </Button>
-                <Button
-                  className="rounded-lg text-white shadow-lg transition duration-200 hover:shadow-primary-hover hover:underline bg-[#FF5A00]"
-                  onClick={handleModal}
-                  size={"sm"}
-                  placeholder={""}
-                >
-                  Close
                 </Button>
               </div>
             </CardFooter>

@@ -49,11 +49,11 @@ https://jenish-support-ticket-app.vercel.app/
 
 3. **Configure Environment Variables:**
 
-##### Create a .env file in the root directory for both frontend and backend and set the necessary environment variables from the provided env.sample file.
+- Create a .env file in the root directory for both frontend and backend and set the necessary environment variables from the provided env.sample file.
 
 4. **Create a MongoDB Cluster:**
 
-   ##### Create a MongoDB cluster from mongodb cloud or you can also create a local cluster using mongodb-compass. Copy the Mongo-URI and paste it in .env file.
+- Create a MongoDB cluster from mongodb cloud or you can also create a local cluster using mongodb-compass. Copy the Mongo-URI and paste it in .env file.
 
 5. **Run the Application:**
 

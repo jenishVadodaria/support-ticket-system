@@ -177,6 +177,7 @@ const getAllSupportTickets = async (req: Request, res: Response) => {
     const skip: number = options.page * options.limit;
 
     const tickets = await SupportTicket.find(filter)
+      .collation({ locale: "en", strength: 2 })
       .select(
         "topic description dateCreated severity type agentName status resolvedOn"
       )

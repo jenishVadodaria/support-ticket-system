@@ -25,6 +25,7 @@ import { TicketData } from "../../Interfaces/TicketTable";
 const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
   const [ticketData, setTicketData] = useState<TicketData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [assignLoading, setAssignLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [limit] = useState(10);
@@ -138,11 +139,11 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
 
   const handleAssignAgent = async (data: TicketData) => {
     try {
+      setAssignLoading(true);
       if (data.agentName && data.agentName.length !== 0) {
         toast.warn("Agent already assigned");
         return;
       }
-
       const response: any = await axios.patch(
         `${constants.baseApiUrl}/support-tickets`,
         {
@@ -157,6 +158,8 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
     } catch (error) {
       console.log(error);
       toast.error("Error assigning agent. Please try again later");
+    } finally {
+      setAssignLoading(false);
     }
   };
 
@@ -346,6 +349,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
                           <button
                             className="relative rounded-lg px-2 py-2 text-white  bg-[#FF5A00] w-[90%]"
                             onClick={() => handleAssignAgent(data)}
+                            disabled={assignLoading}
                           >
                             <Typography
                               variant="small"

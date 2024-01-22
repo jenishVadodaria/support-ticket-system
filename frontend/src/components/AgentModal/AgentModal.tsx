@@ -41,6 +41,7 @@ const AgentModal = ({
     emailRegex: "",
     phoneLength: "",
   });
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleModal = () => {
     setCreateAgentModalShow(!createAgentModalShow);
@@ -97,6 +98,7 @@ const AgentModal = ({
     e.preventDefault();
     if (validateForm()) {
       try {
+        setLoading(true);
         const response: any = await axios.post(
           `${constants.baseApiUrl}/support-agents`,
           {
@@ -115,6 +117,8 @@ const AgentModal = ({
       } catch (error) {
         console.log(error);
         toast.error("Error creating Agent. Please try again later");
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -129,6 +133,7 @@ const AgentModal = ({
           mount: { scale: 1, y: 0 },
           unmount: { scale: 0.9, y: -100 },
         }}
+        size="sm"
       >
         <DialogHeader placeholder={""}>
           <div className="flex flex-row justify-between align-middle w-full">
@@ -142,7 +147,7 @@ const AgentModal = ({
           <Card className="mx-auto w-full shadow-none" placeholder={""}>
             <CardBody placeholder={""}>
               <form onSubmit={handleSubmit}>
-                <div className="w-full flex flex-row justify-between align-middle mb-4">
+                <div className="w-full flex flex-col gap-4 justify-between align-middle mb-4 max-w-[400px]">
                   <div>
                     <Typography className="pb-1" variant="h6" placeholder={""}>
                       Name:
@@ -182,7 +187,7 @@ const AgentModal = ({
                   </div>
                 </div>
 
-                <div className="w-full flex flex-row justify-between align-middle">
+                <div className="w-full flex flex-col gap-4 justify-between align-middle max-w-[400px]">
                   <div>
                     <Typography className="-pb-4" variant="h6" placeholder={""}>
                       Phone:
@@ -224,23 +229,24 @@ const AgentModal = ({
               </form>
             </CardBody>
             <CardFooter className="pt-0" placeholder={""}>
-              <div className="w-full flex flex-row justify-end align-middle gap-4">
+              <div className="w-full flex flex-row justify-center align-middle gap-4">
+                <Button
+                  className="rounded-lg text-black shadow-lg transition duration-200 hover:shadow-primary-hover hover:underline border border-[#FF5A00] bg-white"
+                  onClick={handleModal}
+                  size={"sm"}
+                  placeholder={""}
+                >
+                  Close
+                </Button>
                 <Button
                   className="rounded-lg text-white shadow-lg transition duration-200 hover:shadow-primary-hover hover:underline bg-[#FF5A00]"
                   onClick={handleSubmit}
                   type="submit"
                   size={"sm"}
                   placeholder={""}
+                  disabled={loading}
                 >
                   Submit
-                </Button>
-                <Button
-                  className="rounded-lg text-white shadow-lg transition duration-200 hover:shadow-primary-hover hover:underline bg-[#FF5A00]"
-                  onClick={handleModal}
-                  size={"sm"}
-                  placeholder={""}
-                >
-                  Close
                 </Button>
               </div>
             </CardFooter>
