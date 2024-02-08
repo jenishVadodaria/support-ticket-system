@@ -10,4 +10,4 @@ const metaDataSchema = new Schema({
 
 export const MetaData = mongoose.model("MetaData", metaDataSchema);
 
-MetaData.create({ lastAssignedIndex: -1 });
+// MetaData.create({ lastAssignedIndex: -1 });

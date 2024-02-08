@@ -12,6 +12,7 @@ import {
   MenuItem,
   MenuList,
   Typography,
+  Tooltip,
 } from "@material-tailwind/react";
 import { HiChevronUpDown } from "react-icons/hi2";
 import { debounce } from "lodash";
@@ -38,6 +39,8 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
   const [selectedField, setSelectedField] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [isFiltering, setIsFiltering] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [hoveredDescription, setHoveredDescription] = useState("");
 
   const buildUrl = () => {
     let url = `${constants.baseApiUrl}/support-tickets?`;
@@ -169,6 +172,36 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
     }
   };
 
+  const formatDate = (data: string) => {
+    const date = new Date(data);
+    const formattedDate = date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    return formattedDate;
+  };
+
+  const handleMouseEnter = (description: string) => {
+    setHoveredDescription(description);
+    setTooltipOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setTooltipOpen(false);
+    setHoveredDescription("");
+  };
+
+  const truncateDescription = (description: string, maxWords: number) => {
+    const words = description.split(" ");
+
+    if (words.length > maxWords) {
+      return words.slice(0, maxWords).join(" ") + "...";
+    }
+    return description;
+  };
+
   return (
     <>
       {loading ? (
@@ -279,15 +312,27 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
                             {data.topic}
                           </Typography>
                         </td>
-                        <td className="p-4">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal text-center"
-                            placeholder={""}
+                        <td className="p-4 text-center font-normal">
+                          <Tooltip
+                            content={data.description}
+                            open={
+                              tooltipOpen &&
+                              hoveredDescription === data.description
+                            }
+                            animate={{
+                              mount: { scale: 1, y: 0 },
+                              unmount: { scale: 0, y: 25 },
+                            }}
                           >
-                            {data.description}
-                          </Typography>
+                            <span
+                              onMouseEnter={() =>
+                                handleMouseEnter(data.description)
+                              }
+                              onMouseLeave={handleMouseLeave}
+                            >
+                              {truncateDescription(data.description, 4)}
+                            </span>
+                          </Tooltip>
                         </td>
                         <td className="p-4">
                           <Typography
@@ -327,7 +372,7 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
                             className="font-normal text-center"
                             placeholder={""}
                           >
-                            {data.dateCreated}
+                            {formatDate(data.dateCreated)}
                           </Typography>
                         </td>
 
@@ -338,7 +383,9 @@ const TicketTable = ({ refreshTableData }: { refreshTableData: boolean }) => {
                             className="font-normal text-center"
                             placeholder={""}
                           >
-                            {data.resolvedOn ? data.resolvedOn : "-"}
+                            {data.resolvedOn
+                              ? formatDate(data.resolvedOn)
+                              : "-"}
                           </Typography>
                         </td>
                         <td className="p-4">

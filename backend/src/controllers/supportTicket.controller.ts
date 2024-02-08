@@ -77,9 +77,19 @@ const updateSupportTicket = async (req: Request, res: Response) => {
       throw new ApiError(404, "", ["Ticket not found"]);
     }
 
+    if (existingTicket.agentName) {
+      throw new ApiError(400, "", ["Ticket already assigned to an agent"]);
+    }
+
     const supportAgents = await SupportAgent.find({ active: true });
     if (supportAgents.length === 0) {
       throw new ApiError(400, "No active support agents available");
+    }
+
+    const getAllMetaData = await MetaData.find({});
+
+    if (getAllMetaData.length === 0) {
+      await MetaData.create({ lastAssignedIndex: -1 });
     }
 
     const metaData = await MetaData.findOneAndUpdate(
